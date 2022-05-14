@@ -318,7 +318,7 @@ class Window:
         # c1 = random_color() #cambio
         # c2 = random_color()
         c1 = '#000000'
-        c2 = '#FF0000'
+        c2 = '#CB3234'
         self.default_col_v_fill.set(c1)
         self.default_col_v_outline.set(c2)
 
@@ -423,10 +423,15 @@ class Window:
         popup_menu.post(ev.x_root, ev.y_root)
 
     def clear_all(self):
+
+       try:
+        self.hide()
         self.history.append("Usuario borró el grafo - Hora: " + self.date());
         self.g = None
         self.canvas.delete('all')
-        self.create_graph()
+       except:
+           print("No hay nada que borrar")
+
 
     def set_color(self, variable, button):
         col = askcolor()
@@ -646,7 +651,7 @@ class Window:
                               multigraph=self.multigraph.get())
 
         c1 = '#000000'
-        c2 = '#FF0000'
+        c2 = '#CB3234'
         self.default_col_v_fill.set(c1)
         self.default_col_v_outline.set(c2)
 
@@ -1080,7 +1085,7 @@ class Window:
         self.g = imp(nodos, grafo, p, d, m)
 
         c1 = '#000000'
-        c2 = '#FF0000'
+        c2 = '##CB3234'
         self.default_col_v_fill.set(c1)
         self.default_col_v_outline.set(c2)
 
