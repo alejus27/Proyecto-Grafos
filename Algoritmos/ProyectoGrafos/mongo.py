@@ -40,6 +40,7 @@ def mostrarDatos(tabla):
     result = mongo_client['grafos']['grafo'].find(filter={'id_grafo': 1})
 
     print(list(result))
+    print("prueba")
 
 
 ventana=Tk()
