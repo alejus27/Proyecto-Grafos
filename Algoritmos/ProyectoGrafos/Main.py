@@ -318,7 +318,7 @@ class Window:
         # c1 = random_color() #cambio
         # c2 = random_color()
         c1 = '#000000'
-        c2 = '#CB3234'
+        c2 = '#FF0040'
         self.default_col_v_fill.set(c1)
         self.default_col_v_outline.set(c2)
 
@@ -651,7 +651,7 @@ class Window:
                               multigraph=self.multigraph.get())
 
         c1 = '#000000'
-        c2 = '#CB3234'
+        c2 = '#FF0040'
         self.default_col_v_fill.set(c1)
         self.default_col_v_outline.set(c2)
 
@@ -694,9 +694,18 @@ class Window:
             print("save")
             ImageGrab.grab().crop((x, y, x1, y1)).save(filename + ".png")
 
+            v2 = Tk()
+
+            v2.eval('tk::PlaceWindow . center')
+
+            Label(v2, text="*** ¡Imagen generada exitosamente! ***").pack()
+            Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+            v2.mainloop()
+
         except:
 
-            self.history.append("Usuario exportó grafo en imagen JPG - Hora: " + self.date());
+            self.history.append("Usuario exportó grafo en imagen - Hora: " + self.date());
 
             v2 = Tk()
 
@@ -719,6 +728,15 @@ class Window:
             ImageGrab.grab().crop((x, y, x1, y1)).save(filename + ".pdf")
 
             self.history.append("Usuario exportó grafo en PDF - Hora: " + self.date());
+
+            v2 = Tk()
+
+            v2.eval('tk::PlaceWindow . center')
+
+            Label(v2, text="*** ¡PDF generado exitosamente! ***").pack()
+            Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+            v2.mainloop()
 
         except:
 
@@ -991,6 +1009,15 @@ class Window:
 
             self.history.append("Usuario exportó grafo en excel - Hora: " + self.date());
 
+            v2 = Tk()
+
+            v2.eval('tk::PlaceWindow . center')
+
+            Label(v2, text="*** ¡Excel generado exitosamente! ***").pack()
+            Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+            v2.mainloop()
+
         except:
             v2 = Tk()
 
@@ -1085,7 +1112,7 @@ class Window:
         self.g = imp(nodos, grafo, p, d, m)
 
         c1 = '#000000'
-        c2 = '#CB3234'
+        c2 = '#FF0040'
         self.default_col_v_fill.set(c1)
         self.default_col_v_outline.set(c2)
 
