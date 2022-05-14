@@ -282,6 +282,9 @@ class Window:
 
         self.create_frame.grid_remove()
 
+        if(self.aux):
+            self.configure_frame.grid_remove()
+
         properties_frame = Frame(self.top_frame, height=20)
 
         properties_frame.grid(row=1, column=5)
@@ -305,6 +308,8 @@ class Window:
 
 
     def _make_configure_frame(self):
+
+        self.aux=True
 
         self.configure_frame = Frame(self.top_frame)
         self.configure_frame.grid(row=1, column=8, sticky='wn')
