@@ -332,22 +332,27 @@ class Window:
         self.vertex_icon = Canvas(self.configure_frame, width=20, height=20)
         self.vertex_icon.create_oval(2, 2, 20, 20)
         self.vertex_icon.create_text(11, 11, text='A')
-        self.vertex_icon.grid(row=0, column=0)
+        self.vertex_icon.grid(row=0, column=1)
         self.vertex_size_entry = Entry(self.configure_frame, textvariable=self.default_v_size, width=3)
-        self.vertex_size_entry.grid(row=0, column=1)
+        self.vertex_size_entry.grid(row=0, column=2)
         self.vertex_color_button = Canvas(self.configure_frame, width=20, height=20, bg=self.default_col_v_fill.get())
         self.outline_color_button = Canvas(self.configure_frame, width=20, height=20,
                                            bg=self.default_col_v_outline.get())
-        self.vertex_color_button.grid(row=0, column=3)
-        self.outline_color_button.grid(row=0, column=2)
+        self.vertex_color_button.grid(row=0, column=4)
+        self.outline_color_button.grid(row=0, column=3)
 
         self.rib_icon = Canvas(self.configure_frame, width=20, height=20)
         self.rib_icon.create_line(0, 20, 20, 0, arrow=LAST)
-        self.rib_icon.grid(row=1, column=0)
+        self.rib_icon.grid(row=1, column=1)
         self.rib_color_button = Canvas(self.configure_frame, width=20, height=20, bg=self.default_col_r.get())
         self.weight_color_button = Canvas(self.configure_frame, width=20, height=20, bg=self.default_col_weight.get())
-        self.rib_color_button.grid(row=1, column=1)
-        self.weight_color_button.grid(row=1, column=2)
+        self.rib_color_button.grid(row=1, column=2)
+        self.weight_color_button.grid(row=1, column=3)
+
+        self.l=Label(self.configure_frame, text="    Propiedades del nodo:   ");
+        self.l.grid(row=0, column=0)
+        self.l = Label(self.configure_frame, text="   Propiedades del arco:   ");
+        self.l.grid(row=1, column=0)
 
         # self.width_entry = Entry(self.configure_frame, textvariable = self.width, width = 5)
         # self.height_entry = Entry(self.configure_frame, textvariable=self.height, width = 5)
