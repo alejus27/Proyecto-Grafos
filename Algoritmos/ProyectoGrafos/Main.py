@@ -1085,7 +1085,7 @@ class Window:
         self.g = imp(nodos, grafo, p, d, m)
 
         c1 = '#000000'
-        c2 = '##CB3234'
+        c2 = '#CB3234'
         self.default_col_v_fill.set(c1)
         self.default_col_v_outline.set(c2)
 
