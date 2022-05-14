@@ -130,6 +130,8 @@ class Window:
         self.img_cerrar = PhotoImage(file='icons/kub-remove.png')
         self.img_cerrar = PhotoImage(file='icons/kub-remove.png')
 
+        self.img_ayuda = PhotoImage(file='icons/kub-help.png')
+
         self.menubar = Menu(self.root)
 
         self.file_menu = Menu(self.menubar, tearoff=0)
@@ -216,8 +218,10 @@ class Window:
         self.menubar.add_cascade(label='VENTANA (No implementado aún)', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
-        self.edit_menu.add_command(label='AYUDA')
-        self.edit_menu.add_command(label='ACERCA DE GRAFOS')
+        self.edit_menu.add_command(label='AYUDA',
+                                   image=self.img_ayuda, compound='left')
+        self.edit_menu.add_command(label='ACERCA DE GRAFOS',
+                                   image=self.img_ayuda, compound='left')
         self.menubar.add_cascade(label='AYUDA', menu=self.edit_menu)
 
         self.root.config(menu=self.menubar)
