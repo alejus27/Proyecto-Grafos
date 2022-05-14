@@ -493,9 +493,14 @@ class Window:
         self._make_configure_frame()
 
     def edit_graph(self):
-        self.history.append("Usuario editó el grafo - Hora: " + self.date());
+
 
         if self.g:
+
+            self.history.append("Usuario editó el grafo - Hora: " + self.date());
+
+            self._make_configure_frame()
+
             self.create_frame.grid(row=1, column=1, sticky='wn')
 
             self.next_name = (name for name in [e for e in self.names if e not in self.g.vertices.keys()])
@@ -591,7 +596,7 @@ class Window:
     def finish_function(self):
         self.create_frame.grid_remove()
 
-        self.properties_frame.grid_remove()  # CAMBIO
+        #self.properties_frame.grid_remove()  # CAMBIO
         self.configure_frame.grid_remove()  # CAMBIO
 
         self.cancel_stack = []
@@ -632,6 +637,8 @@ class Window:
         self.ask.focus()
 
         self.history.append("Usuario creó grafo aleatorio - Hora: " + self.date());
+
+        self.hide()
 
     def start_command(self):
         self.g = random_graph(self.ask_vers.get(), self.ask_ribs.get(), weighted=self.weighted.get(),
@@ -1024,7 +1031,7 @@ class Window:
             v2.mainloop()
 
     def importar(self):
-
+      try:
         self.create_graph()
         f = askopenfilename()
         nodos = []
@@ -1055,7 +1062,19 @@ class Window:
         f.close()
         self.s(nodos, grafo, p, d, m)
 
+        self.hide()
+
         self.history.append("Usuario importó el grafo desde JSON - Hora: " + self.date());
+
+      except:
+          v2 = Tk()
+
+          v2.eval('tk::PlaceWindow . center')
+
+          Label(v2, text="*** Error al abrir JSON, intente nuevamente ***").pack()
+          Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+          v2.mainloop()
 
     def s(self, nodos, grafo, p, d, m):
         self.g = imp(nodos, grafo, p, d, m)
@@ -1145,7 +1164,7 @@ class Window:
     def mongo(self):
 
         ventana = Tk()
-        ventana.title("Base de datos")
+        ventana.title("MongoDB Atlas ")
         tabla = ttk.Treeview(ventana, columns=('#0', '#1'))
         tabla.grid(row=1, column=0, columnspan=1)
         tabla.heading("#0", text="ID")
@@ -1153,7 +1172,7 @@ class Window:
         tabla.heading("#2", text="FECHA CREACIÓN")
         self.mostrarDatos(tabla)
 
-        lbl = ttk.Label(ventana, text="INGRESE EL ID DEL GRAFO")
+        lbl = ttk.Label(ventana, text="INGRESE EL ID DEL GRAFO: ")
         lbl.grid(column=3, row=1)
 
         nameEntered = ttk.Entry(ventana)
@@ -1207,6 +1226,21 @@ class Window:
 
         self.s(nodos, grafo, p, d, m)
 
+        self.hide()
+
+
+    def eliminar_db(self,nameEntered):
+        aux = int(nameEntered.get())
+
+
+        mongo_client = MongoClient(
+            "mongodb://test123:test123@cluster0-shard-00-00.brpwd.mongodb.net:27017,cluster0-shard-00-01.brpwd.mongodb.net:27017,cluster0-shard-00-02.brpwd.mongodb.net:27017/myFirstDatabase?ssl=true&replicaSet=atlas-oaj24o-shard-0&authSource=admin&retryWrites=true&w=majority")
+
+        m= mongo_client['grafos']['grafo']
+
+        myquery = {"address": aux}
+
+        m.delete_one(myquery)
 
     def inicio(self):
 
@@ -1237,6 +1271,10 @@ class Window:
 
         root.mainloop()
 
+    def hide(self):
+        self.create_frame.grid_remove()
+
+        self.configure_frame.grid_remove()
 
 
 
