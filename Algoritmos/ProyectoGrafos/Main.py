@@ -31,6 +31,8 @@ import pymongo
 from bson.json_util import dumps, loads
 from datetime import datetime
 from PIL import Image, ImageTk
+import webbrowser
+
 
 user32 = windll.user32
 user32.SetProcessDPIAware()
@@ -218,10 +220,10 @@ class Window:
         self.menubar.add_cascade(label='VENTANA (No implementado aún)', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
-        self.edit_menu.add_command(label='AYUDA',
-                                   image=self.img_ayuda, compound='left')
+        self.edit_menu.add_command(label='MANUAL DE USUARIO',
+                                   image=self.img_ayuda, compound='left', command=self.website)
         self.edit_menu.add_command(label='ACERCA DE GRAFOS',
-                                   image=self.img_ayuda, compound='left')
+                                   image=self.img_ayuda, compound='left', command=self.website2)
         self.menubar.add_cascade(label='AYUDA', menu=self.edit_menu)
 
         self.root.config(menu=self.menubar)
@@ -1308,6 +1310,12 @@ class Window:
 
         self.configure_frame.grid_remove()
 
+
+    def website(self):
+        webbrowser.open("https://drive.google.com/file/d/1btaYYO503juqUd2pNbzHU6mW-bgT2cK5/view")
+
+    def website2(self):
+        webbrowser.open("https://drive.google.com/file/d/1VSuKIcUNscanoi_tlg2VmRmSxk99pqFj/view?usp=drive_open")
 
 
 '''
