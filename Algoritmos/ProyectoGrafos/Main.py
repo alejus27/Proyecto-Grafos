@@ -221,7 +221,7 @@ class Window:
         self.edit_menu = Menu(self.menubar, tearoff=0)
         #self.edit_menu.add_command(label='GRAFICA')
         self.edit_menu.add_command(label='TABLA', command=self.pp)
-        self.menubar.add_cascade(label='VENTANA (No implementado aún)', menu=self.edit_menu)
+        self.menubar.add_cascade(label='VENTANA', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
         self.edit_menu.add_command(label='MANUAL DE USUARIO',
