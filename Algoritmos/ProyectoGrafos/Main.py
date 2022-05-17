@@ -787,11 +787,17 @@ class Window:
             grafo = list(self.g.ribs.values())
             nodos = list(self.g.vertices.keys())
 
+            g = str(grafo)
+
+            g = g.replace("{", "").replace("}", "")
+
+            grafo = ast.literal_eval(g)
+
             result = {
                 'id_grafo': mydoc,
                 'fecha': dt_string,
                 'nodos': [i[0] for i in zip(nodos)],
-                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': i[0][1]} for i in
+                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': i[0][3]} for i in
                           zip(grafo)],
                 'dirigido': self.g.directed,
                 'ponderado': self.g.weighted,
