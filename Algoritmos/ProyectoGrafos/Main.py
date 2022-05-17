@@ -32,7 +32,8 @@ from bson.json_util import dumps, loads
 from datetime import datetime
 from PIL import Image, ImageTk
 import webbrowser
-
+import numpy as np
+from functools import partial
 
 user32 = windll.user32
 user32.SetProcessDPIAware()
@@ -81,6 +82,9 @@ class Window:
         self.history = []
 
         self.aux = False;
+
+        self.n=[]
+        self.a=[]
 
         self.img_n = PhotoImage(file='icons/kub-approve.png')
 
@@ -209,7 +213,7 @@ class Window:
         self.menubar.add_cascade(label='EDITAR', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
-        self.edit_menu.add_command(label='ALGORITMO 1')
+        self.edit_menu.add_command(label='ALGORITMO 1', command=self.pp)
         self.edit_menu.add_command(label='ALGORITMO 2')
         self.edit_menu.add_command(label='ALGORITMO 3')
         self.menubar.add_cascade(label='ANALIZAR (No implementado aún)', menu=self.edit_menu)
@@ -1032,12 +1036,20 @@ class Window:
 
     def guardarjson(self):
         try:
+
             grafo = list(self.g.ribs.values())
             nodos = list(self.g.vertices.keys())
 
+            g = str(grafo)
+
+            g = g.replace("{", "").replace("}", "")
+
+            grafo = ast.literal_eval(g)
+
+
             result = {
                 'nodos': [i[0] for i in zip(nodos)],
-                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': i[0][1]} for i in
+                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': i[0][3]} for i in
                           zip(grafo)],
                 'dirigido': self.g.directed,
                 'ponderado': self.g.weighted,
@@ -1053,6 +1065,15 @@ class Window:
 
             with open(str(f) + '.json', 'w') as outfile:
                 outfile.write(json_string)
+
+            v2 = Tk()
+
+            v2.eval('tk::PlaceWindow . center')
+
+            Label(v2, text="*** ¡JSON guardado exitosamente! ***").pack()
+            Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+            v2.mainloop()
 
         except:
             v2 = Tk()
@@ -1094,11 +1115,21 @@ class Window:
         m = int(data['multigrafo'])
 
         f.close()
+
         self.s(nodos, grafo, p, d, m)
 
         self.hide()
 
         self.history.append("Usuario importó el grafo desde JSON - Hora: " + self.date());
+
+        v2 = Tk()
+
+        v2.eval('tk::PlaceWindow . center')
+
+        Label(v2, text="*** ¡JSON importado exitosamente! ***").pack()
+        Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+        v2.mainloop()
 
       except:
           v2 = Tk()
@@ -1316,6 +1347,94 @@ class Window:
 
     def website2(self):
         webbrowser.open("https://drive.google.com/file/d/1VSuKIcUNscanoi_tlg2VmRmSxk99pqFj/view?usp=drive_open")
+
+    def pp(self):
+        grafo = list(self.g.ribs.values())
+
+        g = str(grafo)
+
+        g = g.replace("{", "").replace("}", "")
+
+        grafo = ast.literal_eval(g)
+
+        origen = [i[0][0] for i in zip(grafo)]
+
+        destino= [i[0][1] for i in zip(grafo)]
+
+        peso = [i[0][2] for i in zip(grafo)]
+
+        sentido = [i[0][3] for i in zip(grafo)]
+
+
+        window = Tk()
+
+        treev = ttk.Treeview(window, selectmode='browse')
+        treev.pack(side='left', expand=True, fill='both')
+
+        verscrlbar = ttk.Scrollbar(window,
+                                   orient="vertical",
+                                   command=treev.yview)
+
+        verscrlbar.pack(side='right', fill='y')
+        treev.configure(yscrollcommand=verscrlbar.set)
+
+        treev["columns"] = ('1', '2','3','4')
+
+        treev['show'] = 'headings'
+
+        treev.column("1", width=90, anchor='c')
+        treev.column("2", width=90, anchor='c')
+        treev.column("3", width=90, anchor='c')
+        treev.column("4", width=90, anchor='c')
+
+        treev.heading("1", text="Origen")
+        treev.heading("2", text="Destino")
+        treev.heading("3", text="Peso")
+        treev.heading("4", text="Sentido")
+
+        for x, y, a, b in zip(origen, destino, peso, sentido):
+            treev.insert("", 'end', values=(x, y,a,b))
+
+        window.mainloop()
+
+
+
+
+
+    def pp2(self):
+
+
+        edges=[*self.g.ribs.values()]
+        nodes=[*self.g.vertices.keys()]
+
+        edgesT = [tuple(x) for x in edges]
+
+        edgesF = [tuple(s if s != s else self.letter_to_int(s) for s in tup) for tup in edgesT]
+
+        nodesF=[self.letter_to_int(i) if i==i else i for i in nodes]
+
+
+        n_nodes = len(nodesF)
+        A = np.zeros((n_nodes, n_nodes))
+
+        for edge in edgesF:
+            i = int(edge[0])
+            j = int(edge[1])
+            weight = edge[2]
+            A[i, j] = weight
+            A[j, i] = weight
+
+
+        print(A)
+
+
+
+    def letter_to_int(self, letter):
+        try:
+            alphabet = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
+            return alphabet.index(letter)
+        except:
+            return letter
 
 
 '''
