@@ -138,6 +138,10 @@ class Window:
 
         self.img_ayuda = PhotoImage(file='icons/kub-help.png')
 
+        self.img_tabla = PhotoImage(file='icons/kub-document.png')
+
+
+
         self.menubar = Menu(self.root)
 
         self.file_menu = Menu(self.menubar, tearoff=0)
@@ -220,7 +224,8 @@ class Window:
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
         #self.edit_menu.add_command(label='GRAFICA')
-        self.edit_menu.add_command(label='TABLA', command=self.pp)
+        self.edit_menu.add_command(label='TABLA', command=self.pp,
+                                   image=self.img_tabla, compound='left')
         self.menubar.add_cascade(label='VENTANA', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
