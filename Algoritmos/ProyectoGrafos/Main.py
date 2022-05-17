@@ -213,14 +213,14 @@ class Window:
         self.menubar.add_cascade(label='EDITAR', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
-        self.edit_menu.add_command(label='ALGORITMO 1', command=self.pp)
+        self.edit_menu.add_command(label='ALGORITMO 1')
         self.edit_menu.add_command(label='ALGORITMO 2')
         self.edit_menu.add_command(label='ALGORITMO 3')
         self.menubar.add_cascade(label='ANALIZAR (No implementado aún)', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
-        self.edit_menu.add_command(label='GRAFICA')
-        self.edit_menu.add_command(label='TABLA')
+        #self.edit_menu.add_command(label='GRAFICA')
+        self.edit_menu.add_command(label='TABLA', command=self.pp)
         self.menubar.add_cascade(label='VENTANA (No implementado aún)', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
