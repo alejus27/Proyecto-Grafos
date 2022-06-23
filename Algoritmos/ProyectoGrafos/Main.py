@@ -1456,6 +1456,7 @@ class Window:
 
 
     def alg_queyranne(self):
+        self.history.append("Usuario ejecuto algorimo queyranne - Hora: " + self.date());
 
         grafo=self.matriz_adj()
         funcion = al.cutfun(grafo)
@@ -1479,6 +1480,8 @@ class Window:
 
         Label(v2, text="Indices: " + str(aux)).pack()
 
+        Label(v2, text="Función submodular: " + str('cutfun')).pack()
+
         Label(v2, text="Candidatos: " + str(al.c)).pack()
 
         al.c.clear()
@@ -1494,7 +1497,10 @@ class Window:
         v2.mainloop()
 
 
+
+
     def alg_spectral(self, n_clusters):
+        self.history.append("Usuario ejecuto algorimo Spectral Clustering - Hora: " + self.date());
         n_clusters = int(n_clusters.get())
         grafo_=self.matriz_adj()
         grafo = numpy.array(grafo_)
@@ -1531,6 +1537,8 @@ class Window:
         v2.mainloop()
 
 
+
+
     def preguntar_cluster(self):
 
         ventana = Tk()
@@ -1548,6 +1556,7 @@ class Window:
         ventana.mainloop()
 
     def alg_ssp(self):
+        self.history.append("Usuario ejecuto algorimo SSP - Hora: " + self.date());
         grafo = self.matriz_adj()
 
         print(len(grafo))
@@ -1588,7 +1597,10 @@ class Window:
         v2.mainloop()
 
 
+
+
     def alg_st(self, texto):
+        self.history.append("Usuario ejecuto algorimo S_T_Mincut - Hora: " + self.date());
         grafo = self.matriz_adj()
         funcion = al.cutfun(grafo)
 
@@ -1628,6 +1640,8 @@ class Window:
         Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
 
         v2.mainloop()
+
+
 
 
     def preguntar_rango(self):
