@@ -1065,7 +1065,7 @@ class Window:
 
             result = {
                 'nodos': [i[0] for i in zip(nodos)],
-                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': str[0][3]} for i in
+                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': str(i[0][3])} for i in
                           zip(grafo)],
                 'dirigido': self.g.directed,
                 'ponderado': self.g.weighted,
