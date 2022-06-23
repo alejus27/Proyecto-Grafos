@@ -4,6 +4,7 @@ from tkinter import *
 from tkinter.colorchooser import askcolor
 from tkinter.filedialog import *
 
+import numpy
 from PIL import ImageTk
 
 from Grafos import *
@@ -34,6 +35,9 @@ from PIL import Image, ImageTk
 import webbrowser
 import numpy as np
 from functools import partial
+
+import algorithms as al
+import time
 
 user32 = windll.user32
 user32.SetProcessDPIAware()
@@ -217,10 +221,11 @@ class Window:
         self.menubar.add_cascade(label='EDITAR', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
-        self.edit_menu.add_command(label='ALGORITMO 1')
-        self.edit_menu.add_command(label='ALGORITMO 2')
-        self.edit_menu.add_command(label='ALGORITMO 3')
-        self.menubar.add_cascade(label='ANALIZAR (No implementado aún)', menu=self.edit_menu)
+        self.edit_menu.add_command(label='QUEYRANNE', command=self.alg_queyranne)
+        self.edit_menu.add_command(label='SPECTRAL CLUSTERING',command=self.preguntar_cluster)
+        self.edit_menu.add_command(label='ST MIN-CUT', command=self.preguntar_rango)
+        self.edit_menu.add_command(label='SSP',command=self.alg_ssp)
+        self.menubar.add_cascade(label='ANALIZAR', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
         #self.edit_menu.add_command(label='GRAFICA')
@@ -797,7 +802,7 @@ class Window:
                 'id_grafo': mydoc,
                 'fecha': dt_string,
                 'nodos': [i[0] for i in zip(nodos)],
-                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': i[0][3]} for i in
+                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': str(i[0][3])} for i in
                           zip(grafo)],
                 'dirigido': self.g.directed,
                 'ponderado': self.g.weighted,
@@ -1060,7 +1065,7 @@ class Window:
 
             result = {
                 'nodos': [i[0] for i in zip(nodos)],
-                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': i[0][3]} for i in
+                'grafo': [{'origen': i[0][0], 'destino': i[0][1], 'peso': i[0][2], 'sentido': str[0][3]} for i in
                           zip(grafo)],
                 'dirigido': self.g.directed,
                 'ponderado': self.g.weighted,
@@ -1412,7 +1417,7 @@ class Window:
 
 
 
-    def pp2(self):
+    def matriz_adj(self):
 
 
         edges=[*self.g.ribs.values()]
@@ -1435,8 +1440,9 @@ class Window:
             A[i, j] = weight
             A[j, i] = weight
 
-
+        A=np.round(A.transpose()).astype(int)
         print(A)
+        return A
 
 
 
@@ -1447,6 +1453,199 @@ class Window:
         except:
             return letter
 
+
+
+    def alg_queyranne(self):
+
+        grafo=self.matriz_adj()
+        funcion = al.cutfun(grafo)
+        indices = [x for x in range(1, len(grafo) + 1)]
+
+        q=al.queyranne(funcion, indices)
+        print(q)
+
+        aux = []
+        for i in range(1, len(grafo) + 1):
+            aux.append(chr(ord('@') + i) + " -> " + str(i))
+
+        ####
+
+        v2 = Tk()
+
+        v2.eval('tk::PlaceWindow . center')
+
+        Label(v2, text="Matriz de adyacencia de grafo: ").pack()
+        Label(v2, text=grafo).pack()
+
+        Label(v2, text="Indices: " + str(aux)).pack()
+
+        Label(v2, text="Candidatos: " + str(al.c)).pack()
+
+        al.c.clear()
+
+        inicio = time.time()
+        Label(v2, text="Solución optima min F(A) s.t. 0<|A|<n: "+str(q)).pack()
+        fin = time.time()
+
+        Label(v2, text="Tiempo de ejecución: " + str(fin - inicio)).pack()
+
+        Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+        v2.mainloop()
+
+
+    def alg_spectral(self, n_clusters):
+        n_clusters = int(n_clusters.get())
+        grafo_=self.matriz_adj()
+        grafo = numpy.array(grafo_)
+
+        c=al.get_clusters(grafo,(n_clusters))
+        print(c)
+
+        aux=[]
+        for i in range(0, len(grafo)):
+            if(i==0):
+                aux.append('A' + " -> " + '0')
+            else:
+                aux.append(chr(ord('@')+i+1)+" -> "+str(i))
+
+        ####
+
+        v2 = Tk()
+
+        v2.eval('tk::PlaceWindow . center')
+
+        Label(v2, text="Matriz de adyacencia de grafo: ").pack()
+        Label(v2, text=grafo_).pack()
+
+        Label(v2, text="Indices: "+str(aux)).pack()
+
+        inicio = time.time()
+        Label(v2, text="Solución optima al problema -> "+str(c)).pack()
+        fin = time.time()
+
+        Label(v2, text="Tiempo de ejecución: " + str(fin - inicio)).pack()
+
+        Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+        v2.mainloop()
+
+
+    def preguntar_cluster(self):
+
+        ventana = Tk()
+
+        lbl = ttk.Label(ventana, text="INGRESE EL NÚMERO MÁXIMO DE CLUSTERS A CONSIDERAR: ")
+        lbl.grid(column=3, row=1)
+
+        nameEntered = ttk.Entry(ventana)
+        nameEntered.grid(column=4, row=1, sticky=W)
+
+        button = ttk.Button(ventana, text="OK", command=lambda: [self.alg_spectral(nameEntered), ventana.destroy()])
+
+        button.grid(column=5, row=1)
+
+        ventana.mainloop()
+
+    def alg_ssp(self):
+        grafo = self.matriz_adj()
+
+        print(len(grafo))
+
+        F = lambda x: len(x)
+        #print(F)
+
+        G = al.Iwata(len(grafo))
+        #print(G)
+
+        s=(al.ssp(F,G,{x for x in range(1,len(grafo)+1)}))
+        print(s)
+
+        aux = []
+        for i in range(1, len(grafo) + 1):
+            aux.append(chr(ord('@') + i) + " -> " + str(i))
+
+
+        ####
+
+        v2 = Tk()
+
+        v2.eval('tk::PlaceWindow . center')
+
+        Label(v2, text="Matriz de adyacencia de grafo: ").pack()
+        Label(v2, text=grafo).pack()
+
+        Label(v2, text="Indices: " + str(aux)).pack()
+
+        inicio = time.time()
+        Label(v2, text="Solución optima al problema -> " + str(s)).pack()
+        fin = time.time()
+
+        Label(v2, text="Tiempo de ejecución: " + str(fin - inicio)).pack()
+
+        Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+        v2.mainloop()
+
+
+    def alg_st(self, texto):
+        grafo = self.matriz_adj()
+        funcion = al.cutfun(grafo)
+
+        texto = str(texto.get()).upper()
+        print(texto)
+        texto=self.letter_to_int(texto)
+
+        rango=set(range(1, len(grafo)+1))
+
+        st=(al.s_t_mincut(funcion,rango,texto, len(grafo)))
+
+
+        print(st)
+
+        aux = []
+        for i in range(1, len(grafo) + 1):
+            aux.append(chr(ord('@') + i) + " -> " + str(i))
+
+
+        ####
+
+        v2 = Tk()
+
+        v2.eval('tk::PlaceWindow . center')
+
+        Label(v2, text="Matriz de adyacencia de grafo: ").pack()
+        Label(v2, text=grafo).pack()
+
+        Label(v2, text="Indices: " + str(aux)).pack()
+
+        inicio = time.time()
+        Label(v2, text="Solución optima al problema -> " + str(st)).pack()
+        fin = time.time()
+
+        Label(v2, text="Tiempo de ejecución: " + str(fin - inicio)).pack()
+
+        Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+        v2.mainloop()
+
+
+    def preguntar_rango(self):
+        import sys
+
+        ventana2 = Tk()
+
+        lbl = ttk.Label(ventana2, text="INGRESE EL NODO A SEPARAR: ")
+        lbl.grid(column=3, row=1)
+
+        nameEntered = ttk.Entry(ventana2)
+        nameEntered.grid(column=4, row=1, sticky=W)
+
+        button = ttk.Button(ventana2, text="OK", command=lambda: [self.alg_st(nameEntered), sys.exit()])
+
+        button.grid(column=5, row=1)
+
+        ventana2.mainloop()
 
 '''
 def random_color():
