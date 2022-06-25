@@ -4,9 +4,10 @@ from matplotlib.testing.jpl_units import m
 
 
 
-#####################################
-##########      QUEYRANNE
-#####################################
+############################################################################################################
+#          QUEYRANNE V1 - CUTFUN
+############################################################################################################
+
 #Algoritmo de Queyranne para minimizar funciones submodulares simétricas
 
 # F: función submodular.
@@ -96,24 +97,20 @@ def cutfun(graph):
     return f
 
 
-#######EJEMPLO DE EJECUCIÓN
-'''grafo = [[0, 1, 1, 0, 0, 0], [1, 0, 1, 0, 0, 0], [1, 1, 0, 1, 0, 1], [0, 0, 1, 0, 1, 1], [0, 0, 0, 1, 0, 1], [0, 0, 1, 1, 1, 0]]
-
-funcion = cutfun(grafo)
-indices = [x for x in range(1, len(grafo) + 1)]
-
-print(queyranne(funcion, indices))'''
 
 
-
-
-#############################################################################################################
-
-#############################
-########         SPECTRAL CLUSTERING
-#############################
+############################################################################################################
+#          SPECTRAL CLUSTERING
+############################################################################################################
 
 #SPECTRAL CLUSTERING Information integration in large brain networks
+
+#Esta función implementa la solución basada en agrupamiento espectral
+#que encuentra el MIB se aplica el agrupamiento espectral a cada
+#matriz de correlación transformada, y se calcula la información integrada
+#en cada bipartición resultante. La conjetura de la función para el MIB de
+#sus datos es la bipartición (entre estos) que minimiza normalizado
+#información integrada.
 
 
 import numpy
@@ -252,11 +249,10 @@ grafo = numpy.array(grafo)
 print(get_clusters(grafo,3))'''
 
 
-#############################################################
+############################################################################################################
+#          SSP
+############################################################################################################
 
-################
-######    SSP
-###############
 #Procedimiento submodular-supermodular de Narasimhan & Bilmes para minimizar la diferencia de dos funciones submodulares
 #Este algoritmo está garantizado para converger a un óptimo local
 
@@ -467,9 +463,12 @@ def charvector(V, A):
     return numpy.array(r)
 
 
-###################
-##### S_T_Mincut
-##################
+
+############################################################################################################
+#          S_T MIN CUT
+############################################################################################################
+
+
 #Algoritmo de punto de norma mínima de Fujishige para minimizar funciones submodulares generales
 #Encontrar el mínimo A de una función submodular tal que s en A y t no en A
 
@@ -499,3 +498,188 @@ def s_t_mincut(F,V,s,t,opt={}):
     F2 = residual(F,{s})
     V2 = numpy.array([[x] for x in V - {s,t}])
     return  min_norm_point(F2,V2,opt,return_type=list)[0]+[s]
+
+
+############################################################################################################
+#          QUEYRANNE V2 - MUTUAL INFORMATION
+############################################################################################################
+
+from re import M
+
+def mutualInformation (m1, m2):
+    sum_mi = 0.0
+    x_value_list = np.unique(m1)
+    y_value_list = np.unique(m2)
+    Px = np.array([ len(m1[m1==xval])/float(len(m1)) for xval in x_value_list ])
+    Py = np.array([ len(m2[m2==yval])/float(len(m2)) for yval in y_value_list ])
+    for i in range(len(x_value_list)):
+        if Px[i] ==0.:
+            continue
+        sy = m2[m1 == x_value_list[i]]
+        if len(sy)== 0:
+            continue
+        pxy = np.array([len(sy[sy==yval])/float(len(m2))  for yval in y_value_list])
+        t = pxy[Py>0.]/Py[Py>0.] /Px[i]
+        sum_mi += sum(pxy[t>0]*np.log2( t[t>0]) )
+    return sum_mi
+
+def pendent_pair(Vprime, V, S, f, params=None):
+    x = 0
+    vnew = Vprime[x]
+    n = len(Vprime)
+    Wi = []
+    used = np.zeros((n, 1))
+    used[x] = 1
+    for i in range(n - 1):
+        vold = vnew
+        Wi = Wi + S[vold]
+        ## update keys
+        keys = np.ones((n, 1)) * np.inf
+        for j in range(n):
+            if used[j]:
+                continue
+            keys[j] = f(Wi + S[Vprime[j]], V, params) - f(S[Vprime[j]], V, params)
+        ## extract min
+        argmin = np.argmin(keys)
+        vnew = Vprime[argmin]
+        used[argmin] = 1
+        fval = np.min(keys)
+    s = vold
+    t = vnew
+    return s, t, fval
+
+
+def diff(A, B):
+    m = np.amax(np.array([np.amax(A), np.amax(B)]))
+    vals = np.zeros((m + 1, 1))
+    vals[A] = 1
+    vals[B] = 0
+    idx = np.nonzero(vals)
+    return idx[0]
+
+
+def optimal_set(V, f, params=None):
+    n = len(V)
+    S = [[] for _ in range(n)]
+    for i in range(n):
+        S[i] = [V[i]]
+    p = np.zeros((n - 1, 1))
+    A = []
+    idxs = range(n)
+    for i in range(n - 1):
+        ## find a pendant pair
+        t, u, fval = pendent_pair(idxs, V, S, f, params)
+        ## candidate solution
+        A.append(S[u])
+        p[i] = f(S[u], V, params)
+        S[t] = [*S[t], *S[u]]
+        idxs = diff(idxs, u)
+        S[u] = []
+
+    ## return minimum solution
+    i = np.argmin(p)
+    R = A[i]
+    fval = p[i]
+    ## make R look pretty
+    notR = diff(V, R)
+    ## R = sorted(R)
+    ## notR = sorted(notR)
+    if R[0] < notR[0]:
+        R = (tuple(R), tuple(notR))
+    else:
+        R = (tuple(notR), tuple(R))
+    return R, fval
+
+
+def k_subset(s, k):
+    if k == len(s):
+        return (tuple([(x,) for x in s]),)
+    k_subs = []
+    for i in range(len(s)):
+        partials = k_subset(s[0:i] + s[i + 1:len(s)], k)
+        for partial in partials:
+            for p in range(len(partial)):
+                k_subs.append(partial[:p] + (partial[p] + (s[i],),) + partial[p + 1:])
+    return k_subs
+
+def uniq_subsets(s):
+    u = set()
+    for x in s:
+        t = []
+        for y in x:
+            y = list(y)
+            y.sort()
+            t.append(tuple(y))
+        t.sort()
+        u.add(tuple(t))
+    return u
+
+def find_partitions(V, k):
+    k_subs = k_subset(V, k)
+    k_subs = uniq_subsets(k_subs)
+    return k_subs
+
+def intersection(a, b):
+    return list(set(a) & set(b))
+
+def union(a, b):
+    return list(set(a) | set(b))
+
+
+###EJEMPLO
+'''m1 = np.array(
+[[0, 1, 1, 0], [1, 0, 1, 0], [1, 1, 0, 1 ], [1, 0, 1, 1]]
+)
+m2 = np.array(
+[[0,0,1,0],[1,0,1,1],[0,1,0,1],[1,0,1,1]]
+)
+
+V = [x for x in range(1, len(m1) + 1)]
+f = lambda V,S, params: mutualInformation(m1,m2)
+
+R, fval = optimal_set(V, f)
+
+print(R)
+print(fval)'''
+
+
+
+
+#################################### RMCMC ##############################################################
+def log_prob(x):
+  return -0.5 * np.sum(x ** 2)
+
+
+def proposal(x, stepsize):
+  return np.random.uniform(low=x - 0.5 * stepsize,high=x + 0.5 * stepsize,size=x.shape)
+
+
+def p_acc_MH(x_new, x_old, log_prob):
+  return min(1, np.exp(log_prob(x_new) - log_prob(x_old)))
+
+
+def sample_MH(x_old, log_prob, stepsize):
+  x_new = proposal(x_old, stepsize)
+  # here we determine whether we accept the new state or not:
+  # we draw a random number uniformly from [0,1] and compare
+  # it with the acceptance probability
+  accept = np.random.random() < p_acc_MH(x_new, x_old, log_prob)
+  if accept:
+      return accept, x_new
+  else:
+      return accept, x_old
+
+
+def build_MH_chain(init, stepsize, n_total, log_prob):
+
+  n_accepted = 0
+  chain = [init]
+
+  for _ in range(n_total):
+    accept, state = sample_MH(chain[-1], log_prob, stepsize)
+    chain.append(state)
+    n_accepted += accept
+
+  acceptance_rate = n_accepted / float(n_total)
+
+  return chain, acceptance_rate

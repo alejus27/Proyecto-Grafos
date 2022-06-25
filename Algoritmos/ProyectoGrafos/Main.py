@@ -1475,7 +1475,7 @@ class Window:
 
         v2.eval('tk::PlaceWindow . center')
 
-        Label(v2, text="Matriz de adyacencia de grafo: ").pack()
+        Label(v2, text="Matriz: ").pack()
         Label(v2, text=grafo).pack()
 
         Label(v2, text="Indices: " + str(aux)).pack()
@@ -1521,7 +1521,7 @@ class Window:
 
         v2.eval('tk::PlaceWindow . center')
 
-        Label(v2, text="Matriz de adyacencia de grafo: ").pack()
+        Label(v2, text="Matriz: ").pack()
         Label(v2, text=grafo_).pack()
 
         Label(v2, text="Indices: "+str(aux)).pack()
@@ -1581,7 +1581,7 @@ class Window:
 
         v2.eval('tk::PlaceWindow . center')
 
-        Label(v2, text="Matriz de adyacencia de grafo: ").pack()
+        Label(v2, text="Matriz: ").pack()
         Label(v2, text=grafo).pack()
 
         Label(v2, text="Indices: " + str(aux)).pack()
@@ -1626,7 +1626,7 @@ class Window:
 
         v2.eval('tk::PlaceWindow . center')
 
-        Label(v2, text="Matriz de adyacencia de grafo: ").pack()
+        Label(v2, text="Matriz: ").pack()
         Label(v2, text=grafo).pack()
 
         Label(v2, text="Indices: " + str(aux)).pack()
