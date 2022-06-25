@@ -557,7 +557,7 @@ def diff(A, B):
     idx = np.nonzero(vals)
     return idx[0]
 
-
+z=[]
 def optimal_set(V, f, params=None):
     n = len(V)
     S = [[] for _ in range(n)]
@@ -571,10 +571,13 @@ def optimal_set(V, f, params=None):
         t, u, fval = pendent_pair(idxs, V, S, f, params)
         ## candidate solution
         A.append(S[u])
+        z.append(S[u])
         p[i] = f(S[u], V, params)
         S[t] = [*S[t], *S[u]]
         idxs = diff(idxs, u)
         S[u] = []
+
+
 
     ## return minimum solution
     i = np.argmin(p)
@@ -645,7 +648,10 @@ print(fval)'''
 
 
 
-#################################### RMCMC ##############################################################
+############################################################################################################
+#          REMCMC
+############################################################################################################
+
 def log_prob(x):
   return -0.5 * np.sum(x ** 2)
 
@@ -660,9 +666,9 @@ def p_acc_MH(x_new, x_old, log_prob):
 
 def sample_MH(x_old, log_prob, stepsize):
   x_new = proposal(x_old, stepsize)
-  # here we determine whether we accept the new state or not:
-  # we draw a random number uniformly from [0,1] and compare
-  # it with the acceptance probability
+  # aquí determinamos si aceptamos o no el nuevo estado:
+  # extraemos un número aleatorio uniformemente de [0,1] y comparamos
+  # con la probabilidad de aceptación
   accept = np.random.random() < p_acc_MH(x_new, x_old, log_prob)
   if accept:
       return accept, x_new

@@ -221,10 +221,12 @@ class Window:
         self.menubar.add_cascade(label='EDITAR', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
-        self.edit_menu.add_command(label='QUEYRANNE', command=self.alg_queyranne)
+        self.edit_menu.add_command(label='QUEYRANNE CUTFUN', command=self.alg_queyranne)
+        self.edit_menu.add_command(label='QUEYRANNE MUTUAL-INFORMATION', command=self.alg_queyranne2)
         self.edit_menu.add_command(label='SPECTRAL CLUSTERING',command=self.preguntar_cluster)
         self.edit_menu.add_command(label='ST MIN-CUT', command=self.preguntar_rango)
         self.edit_menu.add_command(label='SSP',command=self.alg_ssp)
+        self.edit_menu.add_command(label='REMCMC', command=self.alg_remcmc)
         self.menubar.add_cascade(label='ANALIZAR', menu=self.edit_menu)
 
         self.edit_menu = Menu(self.menubar, tearoff=0)
@@ -1417,7 +1419,7 @@ class Window:
 
 
 
-    def matriz_adj(self):
+    def matriz_(self):
 
 
         edges=[*self.g.ribs.values()]
@@ -1442,7 +1444,7 @@ class Window:
 
         A=np.round(A.transpose()).astype(int)
         print(A)
-        return A
+        return np.array(A)
 
 
 
@@ -1458,7 +1460,9 @@ class Window:
     def alg_queyranne(self):
         self.history.append("Usuario ejecuto algorimo queyranne - Hora: " + self.date());
 
-        grafo=self.matriz_adj()
+        grafo=self.matriz_()
+        np.place(grafo, grafo > 1, [1])
+
         funcion = al.cutfun(grafo)
         indices = [x for x in range(1, len(grafo) + 1)]
 
@@ -1495,6 +1499,52 @@ class Window:
         Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
 
         v2.mainloop()
+        
+    def alg_queyranne2(self):
+        self.history.append("Usuario ejecuto algorimo queyranne - Hora: " + self.date());
+
+        m1 =self.matriz_()
+        np.place(m1, m1 > 1, [1])
+        m2 = numpy.random.random_integers(0, 1, (len(m1+1), (len(m1+1))))
+
+        f = lambda V,S, params: al.mutualInformation(m1,m2)
+
+        V = [x for x in range(1, len(m1) + 1)]
+
+        R, fval = al.optimal_set(V, f)
+
+
+        aux = []
+        for i in range(1, len(m1) + 1):
+            aux.append(chr(ord('@') + i) + " -> " + str(i))
+
+        ####
+
+        v2 = Tk()
+
+        v2.eval('tk::PlaceWindow . center')
+
+        Label(v2, text="Matriz: ").pack()
+        Label(v2, text=m1).pack()
+        Label(v2, text="Matriz2: ").pack()
+        Label(v2, text=m2).pack()
+
+        Label(v2, text="Indices: " + str(aux)).pack()
+        inicio = time.time()
+        Label(v2, text="Función submodular: " + str('mutual_information')).pack()
+        Label(v2, text="Candidatos: " + str(al.z)).pack()
+        Label(v2, text="Perdida: " + str(fval)).pack()
+        Label(v2, text="Corte: " + str(R)).pack()
+
+        al.z.clear()
+
+        fin = time.time()
+
+        Label(v2, text="Tiempo de ejecución: " + str(fin - inicio)).pack()
+
+        Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+        v2.mainloop()
 
 
 
@@ -1502,8 +1552,8 @@ class Window:
     def alg_spectral(self, n_clusters):
         self.history.append("Usuario ejecuto algorimo Spectral Clustering - Hora: " + self.date());
         n_clusters = int(n_clusters.get())
-        grafo_=self.matriz_adj()
-        grafo = numpy.array(grafo_)
+        grafo=self.matriz_()
+        np.place(grafo, grafo > 1, [1])
 
         c=al.get_clusters(grafo,(n_clusters))
         print(c)
@@ -1522,7 +1572,7 @@ class Window:
         v2.eval('tk::PlaceWindow . center')
 
         Label(v2, text="Matriz: ").pack()
-        Label(v2, text=grafo_).pack()
+        Label(v2, text=grafo).pack()
 
         Label(v2, text="Indices: "+str(aux)).pack()
 
@@ -1557,7 +1607,8 @@ class Window:
 
     def alg_ssp(self):
         self.history.append("Usuario ejecuto algorimo SSP - Hora: " + self.date());
-        grafo = self.matriz_adj()
+        grafo = self.matriz_()
+        np.place(grafo, grafo > 1, [1])
 
         print(len(grafo))
 
@@ -1601,7 +1652,8 @@ class Window:
 
     def alg_st(self, texto):
         self.history.append("Usuario ejecuto algorimo S_T_Mincut - Hora: " + self.date());
-        grafo = self.matriz_adj()
+        grafo = self.matriz_()
+        np.place(grafo, grafo > 1, [1])
         funcion = al.cutfun(grafo)
 
         texto = str(texto.get()).upper()
@@ -1660,6 +1712,37 @@ class Window:
         button.grid(column=5, row=1)
 
         ventana2.mainloop()
+
+
+    def alg_remcmc(self):
+        self.history.append("Usuario ejecuto algorimo re-mcmc - Hora: " + self.date());
+
+        m=self.matriz_()
+        np.place(m, m > 1, [1])
+
+        al.build_MH_chain(m, 1, 1, al.log_prob)
+        chain, acceptance_rate = al.build_MH_chain(m, 1, 1, al.log_prob)
+
+        ####
+
+        v2 = Tk()
+
+        v2.eval('tk::PlaceWindow . center')
+        inicio = time.time()
+        Label(v2, text="Matriz: ").pack()
+        Label(v2, text=m).pack()
+
+        Label(v2, text="Aceptacion: " + str(acceptance_rate)).pack()
+
+        Label(v2, text="Cadena: " + str(chain)).pack()
+
+        fin = time.time()
+
+        Label(v2, text="Tiempo de ejecución: " + str(fin - inicio)).pack()
+
+        Button(v2, text="OK", bg='black', fg='white', font='sans 8 bold', command=v2.destroy).pack()
+
+        v2.mainloop()
 
 '''
 def random_color():
